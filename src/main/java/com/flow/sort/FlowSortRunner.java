@@ -60,12 +60,10 @@ public class FlowSortRunner extends Configured implements Tool {
         job.setOutputValueClass(NullWritable.class);
 
         FileInputFormat.setInputPaths(job, new Path("/MROutput/"));
-        /* 此处使用 MultipleOutputs 设置输出路径 保证多文件输出*/
+        /* 此处使用 MultipleOutputs 设置输出路径 保证多文件输出  mapper出也可设置分区多输出文件*/
         for (int i = 0; i < 10; i++) {
             MultipleOutputs.addNamedOutput(job, "135" + i, TextOutputFormat.class, FlowBean.class, NullWritable.class);
         }
-
-
         FileOutputFormat.setOutputPath(job, new Path(("/SortOutput/")));
         return job.waitForCompletion(true) ? 0 : 1;
     }
