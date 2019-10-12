@@ -21,40 +21,11 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-
 import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
 
 public class InverseIndexStepTwo extends Configured implements Tool {
-
-    private static class StepTwoMapper extends Mapper<LongWritable, Text, Text, Text> {
-        @Override
-        protected void map(LongWritable key, Text value, Context context)
-                throws IOException, InterruptedException {
-            //输入数据 hello---->filename   count
-            String line = value.toString();
-            String[] fields = StringUtils.split(line, "\t");
-            String[] keyWord = StringUtils.split(fields[0], "---->");//hello filename
-            String filename = keyWord[1];
-            long count = Long.parseLong(fields[1]);//count
-            // <hello,filename---->count>
-            context.write(new Text(keyWord[0] + "\t"), new Text("\t" + filename + "---->" + count));
-        }
-    }
-
-    private static class StepTwoReducer extends Reducer<Text, Text, Text, Text> {
-        @Override
-        protected void reduce(Text key, Iterable<Text> values, Context context)
-                throws IOException, InterruptedException {
-            //得到的数据<hello,{a.txt--->3,b.txt--->1}>
-            String indexValue = "";
-            for (Text value : values) {
-                indexValue += value.toString() + "\t";
-            }
-            context.write(key, new Text(indexValue));
-        }
-    }
 
     private static Log logger = LogFactory.getLog(InverseIndexStepTwo.class);
 
@@ -88,5 +59,33 @@ public class InverseIndexStepTwo extends Configured implements Tool {
         }
 
         return resStepTwo;
+    }
+
+    private static class StepTwoMapper extends Mapper<LongWritable, Text, Text, Text> {
+        @Override
+        protected void map(LongWritable key, Text value, Context context)
+                throws IOException, InterruptedException {
+            //输入数据 hello---->filename   count
+            String line = value.toString();
+            String[] fields = StringUtils.split(line, "\t");
+            String[] keyWord = StringUtils.split(fields[0], "---->");//hello filename
+            String filename = keyWord[1];
+            long count = Long.parseLong(fields[1]);//count
+            // <hello,filename---->count>
+            context.write(new Text(keyWord[0] + "\t"), new Text("\t" + filename + "---->" + count));
+        }
+    }
+
+    private static class StepTwoReducer extends Reducer<Text, Text, Text, Text> {
+        @Override
+        protected void reduce(Text key, Iterable<Text> values, Context context)
+                throws IOException, InterruptedException {
+            //得到的数据<hello,{a.txt--->3,b.txt--->1}>
+            String indexValue = "";
+            for (Text value : values) {
+                indexValue += value.toString() + "\t";
+            }
+            context.write(key, new Text(indexValue));
+        }
     }
 }

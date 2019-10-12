@@ -1,9 +1,5 @@
 package com.flow.counter;
 
-import com.google.gson.internal.bind.JsonTreeWriter;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.MapWritable;
-import org.apache.hadoop.io.SortedMapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 

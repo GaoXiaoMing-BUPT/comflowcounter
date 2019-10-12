@@ -11,7 +11,6 @@ package com.flow.inverse;
 import com.flow.hdfsutil.HdfsUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -24,11 +23,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /*
  *  倒排索引job
@@ -39,35 +35,6 @@ import java.net.URISyntaxException;
 public class InverseIndexStepOne extends Configured implements Tool {
 
     private static final Log logger = LogFactory.getLog(InverseIndexStepOne.class);
-
-    private static class StepOneMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
-
-        @Override
-        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            //拿到一行数据
-            String line = value.toString();
-            String[] fields = StringUtils.split(line, ' ');
-            //从切片中获取文件名
-            FileSplit inputSplit = (FileSplit) context.getInputSplit();
-            Path locationInfo = inputSplit.getPath();
-            String filename = locationInfo.getName();
-            for (String field : fields) {
-                //封装kv，每个hello 封装值为1，然后利用reduce累加
-                context.write(new Text(field + "---->" + filename), new LongWritable(1));
-            }
-        }
-    }
-
-    private static class SteopReducer extends Reducer<Text, LongWritable, Text, LongWritable> {
-        @Override
-        protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
-            long counter = 0;
-            for (LongWritable longWritable : values) {
-                counter += longWritable.get();
-            }
-            context.write(key, new LongWritable(counter));
-        }
-    }
 
     @Override
     public int run(String[] args) throws Exception {
@@ -97,6 +64,35 @@ public class InverseIndexStepOne extends Configured implements Tool {
         }
 
         return job.waitForCompletion(true) ? 0 : 1;
+    }
+
+    private static class StepOneMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
+
+        @Override
+        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            //拿到一行数据
+            String line = value.toString();
+            String[] fields = StringUtils.split(line, ' ');
+            //从切片中获取文件名
+            FileSplit inputSplit = (FileSplit) context.getInputSplit();
+            Path locationInfo = inputSplit.getPath();
+            String filename = locationInfo.getName();
+            for (String field : fields) {
+                //封装kv，每个hello 封装值为1，然后利用reduce累加
+                context.write(new Text(field + "---->" + filename), new LongWritable(1));
+            }
+        }
+    }
+
+    private static class SteopReducer extends Reducer<Text, LongWritable, Text, LongWritable> {
+        @Override
+        protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
+            long counter = 0;
+            for (LongWritable longWritable : values) {
+                counter += longWritable.get();
+            }
+            context.write(key, new LongWritable(counter));
+        }
     }
 
 }

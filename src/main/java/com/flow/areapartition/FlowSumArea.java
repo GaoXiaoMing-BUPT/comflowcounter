@@ -16,16 +16,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
@@ -33,54 +27,21 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.List;
 
 public class FlowSumArea extends Configured implements Tool {
 
 
-    /*
-     *  对原始流量进行统计，不同省份用户的流量统计结果输出到不同省份
-     *  map时会首先执行分组
-     *  需要自定义的逻辑：
-     *  1. 改造分区的逻辑，自定义一个partitioner
-     *  2. 该遭reducer task的并发任务数
-     * */
-    public static class FlowAreaMapper extends Mapper<LongWritable, Text, Text, FlowBean> {
-        @Override
-        protected void setup(Context context) throws IOException, InterruptedException {
-            super.setup(context);
-        }
+    private static final Log logger = LogFactory.getLog(FlowSumArea.class);
 
-        @Override
-        protected void cleanup(Context context) throws IOException, InterruptedException {
-            super.cleanup(context);
+    public static void main(String[] args) throws Exception {
+        HdfsUtil hdfsUtil = new HdfsUtil();
+        if (hdfsUtil.rmdir("/dst_Partition")) {
+            logger.info("输出目录文件删除成功");
         }
-
-        @Override
-        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            //获取各个字段封装成一个FlowBean，
-            String line = value.toString();
-            String[] fields = StringUtils.split(line, ' ');
-            String phoneNumber = fields[0];
-            long upFlow = Long.parseLong(fields[1]);
-            long downFlow = Long.parseLong(fields[2]);
-            context.write(new Text(phoneNumber), new FlowBean(phoneNumber, upFlow, downFlow));
-        }
-    }
-
-    public static class FlowAreaReducer extends Reducer<Text, FlowBean, Text, FlowBean> {
-        @Override
-        protected void reduce(Text key, Iterable<FlowBean> values, Context context)
-                throws IOException, InterruptedException {
-            long upFlowCounter = 0;
-            long downFlowCounter = 0;
-            for (FlowBean flowBean : values) {
-                upFlowCounter += flowBean.getUpFlow();
-                downFlowCounter += flowBean.getDownFlow();
-            }
-            context.write(key, new FlowBean(key.toString(), upFlowCounter, downFlowCounter));
-        }
+        int res = ToolRunner.run(new Configuration(), new FlowSumArea(), args);
+        if (res == 0)
+            hdfsUtil.listFiles("/dst_Partition", true);
+        System.exit(res);
     }
 
     @Override
@@ -110,16 +71,39 @@ public class FlowSumArea extends Configured implements Tool {
         return job.waitForCompletion(true) ? 0 : 1;
     }
 
-    private static final Log logger = LogFactory.getLog(FlowSumArea.class);
+    /*
+     *  对原始流量进行统计，不同省份用户的流量统计结果输出到不同省份
+     *  map时会首先执行分组
+     *  需要自定义的逻辑：
+     *  1. 改造分区的逻辑，自定义一个partitioner
+     *  2. 该遭reducer task的并发任务数
+     * */
+    public static class FlowAreaMapper extends Mapper<LongWritable, Text, Text, FlowBean> {
 
-    public static void main(String[] args) throws Exception {
-        HdfsUtil hdfsUtil = new HdfsUtil();
-        if (hdfsUtil.rmdir("/dst_Partition")) {
-            logger.info("输出目录文件删除成功");
+
+        @Override
+        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            //获取各个字段封装成一个FlowBean，
+            String line = value.toString();
+            String[] fields = StringUtils.split(line, ' ');
+            String phoneNumber = fields[0];
+            long upFlow = Long.parseLong(fields[1]);
+            long downFlow = Long.parseLong(fields[2]);
+            context.write(new Text(phoneNumber), new FlowBean(phoneNumber, upFlow, downFlow));
         }
-        int res = ToolRunner.run(new Configuration(), new FlowSumArea(), args);
-        if (res == 0)
-            hdfsUtil.listFiles("/dst_Partition", true);
-        System.exit(res);
+    }
+
+    public static class FlowAreaReducer extends Reducer<Text, FlowBean, Text, FlowBean> {
+        @Override
+        protected void reduce(Text key, Iterable<FlowBean> values, Context context)
+                throws IOException, InterruptedException {
+            long upFlowCounter = 0;
+            long downFlowCounter = 0;
+            for (FlowBean flowBean : values) {
+                upFlowCounter += flowBean.getUpFlow();
+                downFlowCounter += flowBean.getDownFlow();
+            }
+            context.write(key, new FlowBean(key.toString(), upFlowCounter, downFlowCounter));
+        }
     }
 }
