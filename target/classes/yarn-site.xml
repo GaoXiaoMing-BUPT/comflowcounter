@@ -14,14 +14,40 @@
 -->
 <configuration>
 
-    <!-- Site specific YARN configuration properties -->
-    <property>
-        <name>yarn.resourcemanager.hostname</name>
-        <value>hadoop51</value>
-    </property>
-
-    <property>
-        <name>yarn.nodemanager.aux-services</name>
-        <value>mapreduce_shuffle</value>
-    </property>
+<!-- Site specific YARN configuration properties -->
+	<!-- 开启RM高可用 -->
+	<property>
+		<name>yarn.resourcemanager.ha.enabled</name>
+		<value>true</value>
+	</property>
+	<!-- 指定RM的cluster id -->
+	<property>
+		<name>yarn.resourcemanager.cluster-id</name>
+		<value>yrc</value>
+	</property>
+	<!-- 配置RM的名字 -->
+	<property>
+		<name>yarn.resourcemanager.ha.rm-ids</name>
+		<value>rm1,rm2</value>
+	</property>	
+	<!-- 单独配置每个rm rm1 -->
+	<property>
+		<name>yarn.resourcemanager.hostname.rm1</name>
+		<value>hadoop53</value>
+	</property>	
+	<!-- 单独配置每个rm rm2 -->
+	<property>
+		<name>yarn.resourcemanager.hostname.rm2</name>
+		<value>mysql</value>
+	</property>
+	<!-- 指定zookeeper集群的地址 -->
+	<property>
+		<name>yarn.resourcemanager.zk-address</name>
+		<value>OVS2-zookeeper215:2181,OVS3-zookeeper225:2181,PMA1-zookeeper245:2181</value>
+	</property>	
+	<!-- 配置NodeManager 通过shuffle方式获取数据 -->
+	<property>
+		<name>yarn.nodemanager.aux-services</name>
+		<value>mapreduce_shuffle</value>
+	</property>
 </configuration>

@@ -17,14 +17,17 @@
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-    <property>
-        <name>fs.defaultFS</name>
-        <value>hdfs://hadoop51:9000</value>
-    </property>
+	<property>
+		<name>fs.defaultFS</name>
+		<value>hdfs://federation1</value>
+	</property>
 
-    <property>
-        <name>hadoop.tmp.dir</name>
-        <value>/home/gxm/hadoop/data</value>
-    </property>
-
+	<property>
+		<name>ha.zookeeper.quorum</name>
+		<value>OVS2-zookeeper215:2181,OVS3-zookeeper225:2181,PMA1-zookeeper245:2181</value>
+	</property>
+	<property>
+		<name>hadoop.tmp.dir</name>
+		<value>/home/gxm/hadoop/tmp</value>
+	</property>
 </configuration>

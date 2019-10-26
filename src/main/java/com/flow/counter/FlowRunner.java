@@ -47,6 +47,7 @@ public class FlowRunner extends Configured implements Tool {
     /* 自己书写run方法 */
     @Override
     public int run(String[] args) throws Exception {//传入参数并解析
+
         Configuration conf = new Configuration();
         //conf.set("mapreduce.job.jar", "out\\artifacts\\comflowcounter_jar\\comflowcounter.jar");
         //conf.set("fs.defaultFS","file:///");//这两项用于本地调试
