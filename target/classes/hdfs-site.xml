@@ -17,92 +17,92 @@
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-	<property>
-		<name>dfs.replication</name>
-		<value>3</value>
-	</property>
-	<!-- 配置federation --> 
-	<property>
-		<name>dfs.nameservices</name>
-		<value>federation1</value>
-	</property>
-	<!-- 配置federation的一对NN --> 
-	<property>
-		<name>dfs.ha.namenodes.federation1</name>
-		<value>namenode1,namenode2</value>
-	</property>
-	<!-- 配置namenode1 具体的RPC通信地址 --> 
-	<property>
-		<name>dfs.namenode.rpc-address.federation1.namenode1</name>
-		<value>hadoop51:9000</value>
-	</property>
-	<!-- 配置namenode2 具体的RPC通信地址 --> 
-	<property>
-		<name>dfs.namenode.rpc-address.federation1.namenode2</name>
-		<value>hadoop52:9000</value>
-	</property>
-	<!-- 配置namenode1 具体的htpp地址 --> 
-	<property>
-		<name>dfs.namenode.http-address.federation1.namenode1</name>
-		<value>hadoop51:50070</value>
-	</property>
-	<!-- 配置namenode2 具体的htpp地址 --> 
-	<property>
-		<name>dfs.namenode.http-address.federation1.namenode2</name>
-		<value>hadoop52:50070</value>
-	</property>
-	<!-- 配置NN的元数据在JournalNode上的存放位置 即zookeeper集群中存放 edits的文件位置 --> 
-	<property>
-		<name>dfs.namenode.shared.edits.dir</name>
-		<value>qjournal://OVS2-zookeeper215:8485;OVS3-zookeeper225:8485;PMA1-zookeeper245:8485/federation1</value>
-	</property>
-	<!-- 配置JournalNode在本地磁盘存放数据的位置 --> 
-	<property>
-		<name>dfs.journalnode.edits.dir</name>
-		<value>/home/gxm/hadoop/journaldata</value>
-	</property>
-	<!-- 开启NN配置失败时自动切换 -->
-	<property>
-		<name>dfs.ha.automatic-failover.enabled</name>
-		<value>true</value>
-	</property>
-	<!-- 配置失败自动切换方式 -->
-	<property>
-		<name>dfs.client.failover.proxy.provider.federation1</name>
-		<value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
-	</property>
-	<!-- 配置失败切换的方式，此处使用zkfc的ssh 发送kill命令。自定义脚本直接返回true，也可以按需配置通知服务器 -->
-	<property>
-		<name>dfs.ha.fencing.methods</name>
-		<value>
-			sshfence
-			shell(/bin/true)
-		</value>
-	</property>
-	<!-- 使用sshfence隔离机制时，需要ssh免密登录，此处配置密钥(密钥) -->
-	<property>
-		<name>dfs.ha.fencing.ssh.private-key-files</name>
-		<value>/home/gxm/.ssh/id_rsa</value>
-	</property>	
-	<!-- sshfence超时 时间设置 -->
-	<property>
-		<name>dfs.ha.fencing.ssh.connect-timeout</name>
-		<value>30000</value>
-	</property>
-	<!-- 配置冗余自动删除 默认一小时，此处配置 10s报告一次 -->
-	<property>
-		<name>dfs.blockreport.intervalMsec</name>
-		<value>100000</value>
-	</property>
-	<!-- 节点丢失超时时长设定 2000ms*2 + 1s*10 总共14s -->
-	<property>
-		<name>heartbeat.recheck.interval</name>
-		<value>2000</value>
-	</property>	
-	<property>
-		<name>dfs.heartbeat.interval</name>
-		<value>1</value>
-	</property>	
+    <property>
+        <name>dfs.replication</name>
+        <value>3</value>
+    </property>
+    <!-- 配置federation -->
+    <property>
+        <name>dfs.nameservices</name>
+        <value>federation1</value>
+    </property>
+    <!-- 配置federation的一对NN -->
+    <property>
+        <name>dfs.ha.namenodes.federation1</name>
+        <value>namenode1,namenode2</value>
+    </property>
+    <!-- 配置namenode1 具体的RPC通信地址 -->
+    <property>
+        <name>dfs.namenode.rpc-address.federation1.namenode1</name>
+        <value>hadoop51:9000</value>
+    </property>
+    <!-- 配置namenode2 具体的RPC通信地址 -->
+    <property>
+        <name>dfs.namenode.rpc-address.federation1.namenode2</name>
+        <value>hadoop52:9000</value>
+    </property>
+    <!-- 配置namenode1 具体的htpp地址 -->
+    <property>
+        <name>dfs.namenode.http-address.federation1.namenode1</name>
+        <value>hadoop51:50070</value>
+    </property>
+    <!-- 配置namenode2 具体的htpp地址 -->
+    <property>
+        <name>dfs.namenode.http-address.federation1.namenode2</name>
+        <value>hadoop52:50070</value>
+    </property>
+    <!-- 配置NN的元数据在JournalNode上的存放位置 即zookeeper集群中存放 edits的文件位置 -->
+    <property>
+        <name>dfs.namenode.shared.edits.dir</name>
+        <value>qjournal://OVS2-zookeeper215:8485;OVS3-zookeeper225:8485;PMA1-zookeeper245:8485/federation1</value>
+    </property>
+    <!-- 配置JournalNode在本地磁盘存放数据的位置 -->
+    <property>
+        <name>dfs.journalnode.edits.dir</name>
+        <value>/home/gxm/hadoop/journaldata</value>
+    </property>
+    <!-- 开启NN配置失败时自动切换 -->
+    <property>
+        <name>dfs.ha.automatic-failover.enabled</name>
+        <value>true</value>
+    </property>
+    <!-- 配置失败自动切换方式 -->
+    <property>
+        <name>dfs.client.failover.proxy.provider.federation1</name>
+        <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+    </property>
+    <!-- 配置失败切换的方式，此处使用zkfc的ssh 发送kill命令。自定义脚本直接返回true，也可以按需配置通知服务器 -->
+    <property>
+        <name>dfs.ha.fencing.methods</name>
+        <value>
+            sshfence
+            shell(/bin/true)
+        </value>
+    </property>
+    <!-- 使用sshfence隔离机制时，需要ssh免密登录，此处配置密钥(密钥) -->
+    <property>
+        <name>dfs.ha.fencing.ssh.private-key-files</name>
+        <value>/home/gxm/.ssh/id_rsa</value>
+    </property>
+    <!-- sshfence超时 时间设置 -->
+    <property>
+        <name>dfs.ha.fencing.ssh.connect-timeout</name>
+        <value>30000</value>
+    </property>
+    <!-- 配置冗余自动删除 默认一小时，此处配置 10s报告一次 -->
+    <property>
+        <name>dfs.blockreport.intervalMsec</name>
+        <value>100000</value>
+    </property>
+    <!-- 节点丢失超时时长设定 2000ms*2 + 1s*10 总共14s -->
+    <property>
+        <name>heartbeat.recheck.interval</name>
+        <value>2000</value>
+    </property>
+    <property>
+        <name>dfs.heartbeat.interval</name>
+        <value>1</value>
+    </property>
 </configuration>
 
 

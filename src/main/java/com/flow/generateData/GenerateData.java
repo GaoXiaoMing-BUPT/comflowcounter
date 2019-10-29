@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 
 public class GenerateData {
     public static void main(String[] args) throws IOException {
-        String log_name = "log.txt";
+        String log_name = "hive_part.txt";
         File file = new File(log_name);
         if (file.exists() == false) {
             try {
@@ -24,15 +24,19 @@ public class GenerateData {
                 e.printStackTrace();
             }
         }
-        FileWriter fileWriter = new FileWriter(file, true);
+        FileWriter fileWriter = new FileWriter(file, false);
         PrintWriter printWriter = new PrintWriter(fileWriter);
 
-
+        String[] parts = {"part1", "part2", "part3", "part4"};
         for (int i = 0; i < 1000; i++) {
             String phoneNumber = generateNum();
             long up_flow = (long) (Math.random() * Math.exp(3));
             long down_flow = (long) (Math.random() * Math.exp(5));
-            printWriter.println(phoneNumber + " " + up_flow + " " + down_flow);
+            String text = phoneNumber + "\t" + up_flow + "\t" + down_flow + "\t" + parts[(int) (Math.random() * 4)];
+            printWriter.println(text);
+            if (text.split("\\t").length != 4)
+                System.exit(1);
+
         }
         printWriter.close();
     }
